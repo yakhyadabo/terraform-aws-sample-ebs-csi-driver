@@ -4,7 +4,7 @@ locals {
 }
 
 module "ebs_csi_driver" {
-  source               = "./module"
+  source               = "../module"
   cluster_name         = local.cluster_name
   oidc_provider_url    = local.oidc_provider_url
 }
