@@ -1,6 +1,8 @@
 locals {
-  //iam_role_name = var.iam_role_name == "" ? null : var.iam_role_name
+  iam_role_name = "ebs-csi-driver"
   kms_key_arn = var.kms_key_arn == "" ? null : var.kms_key_arn
+  ebs_addon_name = "aws-ebs-csi-driver"
+  ebs_addon_version = "v1.5.2-eksbuild.1"
 }
 
 data "aws_eks_cluster" "eks" {
@@ -38,7 +40,7 @@ data "aws_iam_policy_document" "ebs_csi_assume_role_policy" {
 
 resource "aws_iam_role" "ebs_csi" {
   assume_role_policy = data.aws_iam_policy_document.ebs_csi_assume_role_policy.json
-  name               = "ebs-csi"
+  name               = local.iam_role_name
 }
 
 resource "aws_iam_role_policy_attachment" "ebs_csi" {
@@ -57,11 +59,11 @@ resource "aws_iam_role_policy" "kms" {
 
 resource "aws_eks_addon" "ebs_csi" {
   cluster_name             = var.cluster_name
-  addon_name               = "aws-ebs-csi-driver"
-  addon_version            = "v1.5.2-eksbuild.1"
+  addon_name               = local.ebs_addon_name
+  addon_version            = local.ebs_addon_version
   service_account_role_arn = aws_iam_role.ebs_csi.arn
   tags = {
-    "eks_addon" = "ebs-csi"
+    "eks_addon" = "ebs-csi-driver"
     "terraform" = "true"
   }
 }
